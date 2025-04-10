@@ -61,12 +61,13 @@ public class PlayerController {
     )
     public ResponseEntity<String> createPlayer(@RequestBody PlayerInputDto playerInputDto){
         try {
+            logger.info("Creating Player of " + playerInputDto);
             Player player = new Player();
-            player.setEp(playerInputDto.getEp());
-            player.setGp(playerInputDto.getGp());
+            player.setEp(0);
+            player.setGp(0);
             player.setName(playerInputDto.getName());
             player.setRank(playerInputDto.getRank());
-            player.setId(playerInputDto.getId());
+            player.setId(null);
             player.setActive(true);
             Player playerResponse = playerService.createPlayer(player);
             return new ResponseEntity<>("Successfully created a new player entry. " + playerResponse, HttpStatus.OK);
