@@ -26,10 +26,13 @@ public class PlayerService {
     private RaidRewardsService raidRewardsService;
 
     @Autowired
-    CharacterService characterService;
+    private CharacterService characterService;
 
     @Autowired
-    CharacterRepository characterRepository;
+    private LogService logService;
+
+    @Autowired
+    private CharacterRepository characterRepository;
 
     public List<PlayerDto> getAllPlayers(){
         List<Player> players = playerRepository.findAll();
@@ -108,12 +111,15 @@ public class PlayerService {
             return ResponseEntity.badRequest().body("Unable to find the following Characters: " + missingCharacters.toString() + ".");
         }
 
+        String logMessage = "Awarded " + raidReward.getRewardValue() + " EP for \"" + raidReward.getRewardType() + "\" :";
         for(Character character : characters){
             double modifier = (double) characterCountMap.get(character.getName().toLowerCase()) / maxCount;
             Player player = character.getPlayer();
             player.setEp(player.getEp() + (raidReward.getRewardValue() * modifier));
+            logMessage = logMessage + " " + player.getName() + ",";
             playerRepository.save(player);
         }
+        logService.addLogToDb(logMessage.substring(0, logMessage.length()-1));
         return ResponseEntity.ok("Successfully awarded EP to all Players of the characters. Reminder: EP is calculated based on the # of character appearances, not the rows.");
     }
 
@@ -125,7 +131,8 @@ public class PlayerService {
         Player targetPlayer = targetCharacter.getPlayer();
         targetPlayer.setGp(targetPlayer.getGp() + gpValue);
         playerRepository.save(targetPlayer);
-        logger.info("Awarded " + gpValue + " to player " + targetPlayer.getId());
+        logger.info("Awarded " + gpValue + " GP to player " + targetPlayer.getId());
+        logService.addLogToDb("Awarded " + gpValue + " GP to player " + targetPlayer.getName());
         return ResponseEntity.ok("Successfully added GP.");
     }
 
@@ -138,6 +145,7 @@ public class PlayerService {
             }
         }
         playerRepository.saveAll(players);
+        logService.addLogToDb("Applied weeklay decay of " + weeklyDecay);
         return ResponseEntity.ok("Successfully decayed all non-frozen players.");
     }
 

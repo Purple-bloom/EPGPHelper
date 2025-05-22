@@ -18,3 +18,5 @@ drop sequence if exists characters_seq;
 drop table if exists characters;
 drop sequence if exists players_seq;
 drop table if exists players;
+drop sequence if exists logs_seq;
+drop table if exists logs;

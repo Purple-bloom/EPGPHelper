@@ -75,3 +75,10 @@ create table raidruns_bosses (
 	boss integer references bosses,
 	defeated bool
 );
+
+create sequence logs_seq;
+create table logs (
+    id serial primary key,
+    time timestamp,
+    message text
+);
