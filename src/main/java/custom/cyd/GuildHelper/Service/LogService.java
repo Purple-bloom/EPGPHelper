@@ -28,7 +28,7 @@ public class LogService {
     }
 
     public List<Log> getRecentLogs(){
-        return logRepository.findFirst10ByOrderByTimeDesc();
+        return logRepository.findFirst10ByOrderByTimeAsc();
     }
 
     public List<Log> getAllLogs(){
