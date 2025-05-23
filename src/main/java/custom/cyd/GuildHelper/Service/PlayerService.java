@@ -111,15 +111,15 @@ public class PlayerService {
             return ResponseEntity.badRequest().body("Unable to find the following Characters: " + missingCharacters.toString() + ".");
         }
 
-        String logMessage = "Awarded " + raidReward.getRewardValue() + " EP for \"" + raidReward.getRewardType() + "\" :";
+
         for(Character character : characters){
             double modifier = (double) characterCountMap.get(character.getName().toLowerCase()) / maxCount;
             Player player = character.getPlayer();
             player.setEp(player.getEp() + (raidReward.getRewardValue() * modifier));
-            logMessage = logMessage + " " + player.getName() + ",";
             playerRepository.save(player);
+            String logMessage = "Awarded " + (raidReward.getRewardValue() * modifier) + " EP to player " + player.getName() + "for \"" + raidReward.getRewardType() + "\"";
+            logService.addLogToDb(logMessage);
         }
-        logService.addLogToDb(logMessage.substring(0, logMessage.length()-1));
         return ResponseEntity.ok("Successfully awarded EP to all Players of the characters. Reminder: EP is calculated based on the # of character appearances, not the rows.");
     }
 
