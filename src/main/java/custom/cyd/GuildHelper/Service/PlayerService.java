@@ -117,8 +117,10 @@ public class PlayerService {
             Player player = character.getPlayer();
             player.setEp(player.getEp() + (raidReward.getRewardValue() * modifier));
             playerRepository.save(player);
-            String logMessage = "Awarded " + String.format("%.2f", (raidReward.getRewardValue() * modifier)) + " EP to player " + player.getName() + " for \"" + raidReward.getRaid().getName() + ": " + raidReward.getRewardType() + "\"";
-            logService.addLogToDb(logMessage);
+            if(raidReward.getRewardValue() != 0) {
+                String logMessage = "Awarded " + String.format("%.2f", (raidReward.getRewardValue() * modifier)) + " EP to player " + player.getName() + " for \"" + raidReward.getRaid().getName() + ": " + raidReward.getRewardType() + "\"";
+                logService.addLogToDb(logMessage);
+            }
         }
         return ResponseEntity.ok("Successfully awarded EP to all Players of the characters. Reminder: EP is calculated based on the # of character appearances, not the rows.");
     }
