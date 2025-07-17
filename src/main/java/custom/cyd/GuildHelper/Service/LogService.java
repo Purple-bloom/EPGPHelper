@@ -5,10 +5,7 @@ import custom.cyd.GuildHelper.Repository.LogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
 import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.logging.Logger;
@@ -28,7 +25,7 @@ public class LogService {
     }
 
     public List<Log> getRecentLogs(){
-        return logRepository.findFirst10ByOrderByTimeAsc();
+        return logRepository.findFirst100ByOrderByTimeAsc();
     }
 
     public List<Log> getAllLogs(){
