@@ -65,6 +65,11 @@ public class PlayerService {
             logger.severe("Request to update player was made with non-existent player object: " + player.toString());
             return null;
         }
+        if(originalPlayer.getGp() != player.getGp() || originalPlayer.getEp() != player.getEp()){
+            logService.addLogToDb("Manually overriding player " + player.getName() +
+                    " from EP: " + originalPlayer.getEp() + " and GP: " + originalPlayer.getGp() +
+                    " to new EP: " + player.getEp() + " and new GP: " + player.getGp());
+        }
         originalPlayer.setName(player.getName());
         originalPlayer.setRank(player.getRank());
         originalPlayer.setEp(player.getEp());
