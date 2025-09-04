@@ -111,6 +111,64 @@ public class PlayerService {
             return ResponseEntity.badRequest().body("Unable to find the following Characters: " + missingCharacters.toString() + ".");
         }
 
+        ArrayList<Long> alreadyRewardedPlayers = new ArrayList<Long>();
+        for(Character character : characters){
+            double modifier = (double) characterCountMap.get(character.getName().toLowerCase()) / maxCount;
+            Player player = character.getPlayer();
+            if(alreadyRewardedPlayers.contains(player.getId())){
+                logService.addLogToDb("Not rewarding player " + player.getName() + " another time - they appeared more than once, probably due to multiboxing or an incorrect character-player relation.");
+            } else {
+                alreadyRewardedPlayers.add(player.getId());
+                player.setEp(player.getEp() + (raidReward.getRewardValue() * modifier));
+                playerRepository.save(player);
+                if(raidReward.getRewardValue() != 0) {
+                    String logMessage = "Awarded " + String.format("%.2f", (raidReward.getRewardValue() * modifier)) + " EP to player " + player.getName() + " for \"" + raidReward.getRaid().getName() + ": " + raidReward.getRewardType() + "\"";
+                    logService.addLogToDb(logMessage);
+                }
+            }
+
+        }
+        return ResponseEntity.ok("Successfully awarded EP to all Players of the characters. Reminder: EP is calculated based on the # of character appearances, not the rows.");
+    }
+
+    public ResponseEntity<String> unrewardPlayers(String[][] characternames, Long raidRewardId){
+        RaidReward raidReward = raidRewardsService.getRaidReward(raidRewardId).orElse(null);
+        if(raidReward == null){
+            logger.severe("Attempted update with invalid Raidreward. " + raidRewardId);
+            return null;
+        }
+        Map<String, Integer> characterCountMap = new HashMap<>();
+        for(String[] row : characternames){
+            for(String characterString : row){
+                characterString = characterString.toLowerCase();
+                if(characterCountMap.containsKey(characterString)){
+                    characterCountMap.put(characterString, characterCountMap.get(characterString) + 1);
+                } else {
+                    characterCountMap.put(characterString, 1);
+                }
+            }
+        }
+
+        Integer maxCount = 0;
+        for(Integer count : characterCountMap.values()){
+            if(count > maxCount) maxCount = count;
+        }
+
+        ArrayList<String> missingCharacters = new ArrayList<>();
+        List<Character> characters = new ArrayList<>();
+
+        for(String characterName : characterCountMap.keySet()){
+            Character character = characterRepository.findByNameIgnoreCase(characterName).orElse(null);
+            if(character == null){
+                logger.severe("unable to find character for name " + characterName + ". This will result in no players being updated!");
+                missingCharacters.add(characterName);
+            }
+            characters.add(character);
+        }
+        if(!missingCharacters.isEmpty()){
+            return ResponseEntity.badRequest().body("Unable to find the following Characters: " + missingCharacters.toString() + ".");
+        }
+
 
         for(Character character : characters){
             double modifier = (double) characterCountMap.get(character.getName().toLowerCase()) / maxCount;
