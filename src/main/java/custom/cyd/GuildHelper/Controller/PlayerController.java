@@ -4,7 +4,9 @@ import custom.cyd.GuildHelper.Dto.PlayerDto;
 import custom.cyd.GuildHelper.Dto.PlayerInputDto;
 import custom.cyd.GuildHelper.Entity.Player;
 import custom.cyd.GuildHelper.Entity.RaidReward;
+import custom.cyd.GuildHelper.Entity.Setting;
 import custom.cyd.GuildHelper.Service.PlayerService;
+import custom.cyd.GuildHelper.Service.SettingService;
 import jakarta.websocket.server.PathParam;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,9 +112,9 @@ public class PlayerController {
             consumes = "application/json",
             produces = "application/json"
     )
-    public ResponseEntity<String> awardGpToPlayer(@RequestBody Integer awardAmount, @PathVariable("id") Long id){
-        logger.info("GP award player endpoint called of character: " + id + " for amount " + awardAmount);
-        return playerService.awardGpToPlayerOfCharacter(id, awardAmount);
+    public ResponseEntity<String> awardGpToPlayer(@RequestBody Integer bidType, @PathVariable("id") Long id){
+        logger.info("GP award player endpoint called of character: " + id + " for bid type " + bidType);
+        return playerService.awardGpToPlayerOfCharacter(id, bidType);
     }
 
     @PostMapping(
@@ -122,5 +124,27 @@ public class PlayerController {
     public ResponseEntity<String> applyWeeklyDecay(){
         logger.info("Applying weekly decay.");
         return playerService.applyWeeklyDecay();
+    }
+
+    @PostMapping(
+            value = "/changeSetting",
+            consumes = "application/json",
+            produces = "application/json"
+    )
+    public ResponseEntity<String> changeSetting(@RequestBody Setting setting){
+        logger.info("Changing setting" + setting.getSettingName() + " to new value " + setting.getSettingValue() + ".");
+        if(setting.getSettingName().equalsIgnoreCase(SettingService.MINIMUM_GP_SETTING_NAME)){
+            return playerService.updateMinimumGp(setting.getSettingValue());
+        } else if (setting.getSettingName().equalsIgnoreCase(SettingService.WEEKLY_DECAY_SETTING_NAME)){
+            return playerService.updateWeeklyDecay(setting.getSettingValue());
+        } else if (setting.getSettingName().equalsIgnoreCase(SettingService.HIGH_BID_SETTING_NAME)){
+            return playerService.updateHighBidCost(setting.getSettingValue());
+        } else if (setting.getSettingName().equalsIgnoreCase(SettingService.MID_BID_SETTING_NAME)){
+            return playerService.updateMidBidCost(setting.getSettingValue());
+        } else if (setting.getSettingName().equalsIgnoreCase(SettingService.LOW_BID_SETTING_NAME)){
+            return playerService.updateLowBidCost(setting.getSettingValue());
+        } else {
+            return ResponseEntity.badRequest().body("Could not find setting to edit.");
+        }
     }
 }

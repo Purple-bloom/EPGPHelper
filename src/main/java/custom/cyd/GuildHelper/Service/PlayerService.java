@@ -6,6 +6,7 @@ import custom.cyd.GuildHelper.Entity.Player;
 import custom.cyd.GuildHelper.Entity.RaidReward;
 import custom.cyd.GuildHelper.Repository.CharacterRepository;
 import custom.cyd.GuildHelper.Repository.PlayerRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -16,8 +17,11 @@ import java.util.logging.Logger;
 @Service
 public class PlayerService {
     Logger logger = Logger.getLogger(PlayerService.class.getName());
-    public static final double minimumGp = 10;
-    public static final double weeklyDecay = 0.2;
+    private static double minimumGp;
+    private static double weeklyDecay;
+    private static int lowBidCost;
+    private static int midBidCost;
+    private static int highBidCost;
 
     @Autowired
     private PlayerRepository playerRepository;
@@ -32,11 +36,50 @@ public class PlayerService {
     private LogService logService;
 
     @Autowired
+    private SettingService settingService;
+
+    @Autowired
     private CharacterRepository characterRepository;
 
     public List<PlayerDto> getAllPlayers(){
         List<Player> players = playerRepository.findAll();
         return convertPlayersToDtos(players);
+    }
+
+    @PostConstruct
+    private void initializePlayerService(){
+        minimumGp = settingService.loadSetting(SettingService.MINIMUM_GP_SETTING_NAME);
+        weeklyDecay = (double) settingService.loadSetting(SettingService.WEEKLY_DECAY_SETTING_NAME) / 100;
+        lowBidCost = settingService.loadSetting(SettingService.LOW_BID_SETTING_NAME);
+        midBidCost = settingService.loadSetting(SettingService.MID_BID_SETTING_NAME);
+        highBidCost = settingService.loadSetting(SettingService.HIGH_BID_SETTING_NAME);
+
+        if(minimumGp == 0){
+            settingService.addSetting(SettingService.MINIMUM_GP_SETTING_NAME, 10);
+            minimumGp = 10;
+        }
+        if(weeklyDecay == 0){
+            settingService.addSetting(SettingService.WEEKLY_DECAY_SETTING_NAME, 20);
+            weeklyDecay = (double) 20 /100;
+        }
+        if(lowBidCost == 0){
+            settingService.addSetting(SettingService.LOW_BID_SETTING_NAME, 5);
+            lowBidCost = 5;
+        }
+        if(midBidCost == 0){
+            settingService.addSetting(SettingService.MID_BID_SETTING_NAME, 15);
+            midBidCost = 15;
+        }
+        if(highBidCost == 0){
+            settingService.addSetting(SettingService.HIGH_BID_SETTING_NAME, 45);
+            highBidCost = 45;
+        }
+        System.out.printf("Initialized PlayerService with following Attributes and values %s:%f %s:%f %s:%d %s:%d %s:%d",
+                SettingService.MINIMUM_GP_SETTING_NAME, minimumGp,
+                SettingService.WEEKLY_DECAY_SETTING_NAME, weeklyDecay,
+                SettingService.LOW_BID_SETTING_NAME, lowBidCost,
+                SettingService.MID_BID_SETTING_NAME, midBidCost,
+                SettingService.HIGH_BID_SETTING_NAME, highBidCost);
     }
 
     public Optional<Player> getPlayer(Long id){
@@ -188,10 +231,12 @@ public class PlayerService {
         return ResponseEntity.ok("Successfully awarded EP to all Players of the characters. Reminder: EP is calculated based on the # of character appearances, not the rows.");
     }
 
-    public ResponseEntity<String> awardGpToPlayerOfCharacter(Long id, int gpValue){
-        if(gpValue != 5 && gpValue != 15 && gpValue != 45){
-            return ResponseEntity.badRequest().body("Fuck off");
-        }
+    public ResponseEntity<String> awardGpToPlayerOfCharacter(Long id, int bidType){
+        int gpValue = 0;
+        if(bidType == 1) gpValue = lowBidCost;
+        if(bidType == 2) gpValue = midBidCost;
+        if(bidType == 3) gpValue = highBidCost;
+
         Character targetCharacter = characterService.getCharacterById(id);
         Player targetPlayer = targetCharacter.getPlayer();
         targetPlayer.setGp(targetPlayer.getGp() + gpValue);
@@ -205,7 +250,7 @@ public class PlayerService {
         List<Player> players = playerRepository.findAll();
         for(Player player : players){
             if(player.getActive()) {
-                player.setGp(10 + (player.getGp() - 10) * (1 - weeklyDecay));
+                player.setGp(minimumGp + (player.getGp() - minimumGp) * (1 - weeklyDecay));
                 player.setEp(player.getEp() * (1 - weeklyDecay));
             }
         }
@@ -221,5 +266,61 @@ public class PlayerService {
             out.add(new PlayerDto(player));
         }
         return out;
+    }
+
+    private void changeAllGpValuesBy(int diff){
+        List<Player> allPlayers = playerRepository.findAll();
+        for (Player player : allPlayers){
+            player.setGp(player.getGp() - diff);
+        }
+        playerRepository.saveAll(allPlayers);
+    }
+
+    public ResponseEntity<String> updateMinimumGp(int newValue){
+        if (newValue <= 0){
+            return ResponseEntity.badRequest().body("Invalid setting value.");
+        }
+        int oldGpMinimum = settingService.loadSetting(SettingService.MINIMUM_GP_SETTING_NAME);
+        int gpDiff = oldGpMinimum - newValue;
+        changeAllGpValuesBy(gpDiff);
+        settingService.changeSetting(SettingService.MINIMUM_GP_SETTING_NAME, newValue);
+        minimumGp = newValue;
+        return ResponseEntity.ok("Setting changed and ALL players updated with new GP values (difference to minimum is retained).");
+    }
+
+    public ResponseEntity<String> updateWeeklyDecay(int newValue){
+        if (newValue < 0 || newValue > 100){
+            return ResponseEntity.badRequest().body("Invalid setting value.");
+        }
+        settingService.changeSetting(SettingService.WEEKLY_DECAY_SETTING_NAME, newValue);
+        weeklyDecay = newValue;
+        return ResponseEntity.ok("Setting changed.");
+    }
+
+    public ResponseEntity<String> updateLowBidCost(int newValue){
+        if (newValue < 0){
+            return ResponseEntity.badRequest().body("Invalid setting value.");
+        }
+        settingService.changeSetting(SettingService.LOW_BID_SETTING_NAME, newValue);
+        lowBidCost = newValue;
+        return ResponseEntity.ok("Setting changed.");
+    }
+
+    public ResponseEntity<String> updateMidBidCost(int newValue){
+        if (newValue < 0){
+            return ResponseEntity.badRequest().body("Invalid setting value.");
+        }
+        settingService.changeSetting(SettingService.MID_BID_SETTING_NAME, newValue);
+        midBidCost = newValue;
+        return ResponseEntity.ok("Setting changed.");
+    }
+
+    public ResponseEntity<String> updateHighBidCost(int newValue){
+        if (newValue < 0){
+            return ResponseEntity.badRequest().body("Invalid setting value.");
+        }
+        settingService.changeSetting(SettingService.HIGH_BID_SETTING_NAME, newValue);
+        highBidCost = newValue;
+        return ResponseEntity.ok("Setting changed.");
     }
 }

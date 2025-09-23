@@ -5,6 +5,7 @@ CREATE TABLE players (
     rank	varchar(40) not null,
     ep 		numeric(8, 2),
     gp		numeric(8, 2),
+    active  boolean,
     constraint name_unique unique (name),
     constraint minimum_gp check(gp >= 10)
 );
@@ -81,4 +82,9 @@ create table logs (
     id serial primary key,
     time timestamp,
     message text
+);
+
+CREATE TABLE settings (
+    name 	varchar(40) primary key,
+    value	integer
 );
