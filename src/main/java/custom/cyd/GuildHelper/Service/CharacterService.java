@@ -44,7 +44,7 @@ public class CharacterService {
     }
 
     public Character createCharacter(Character character){
-        assert character.getName() != null;//TODO: Properly check this shit
+        assert character.getName() != null; //TODO: Properly check this shit
         return characterRepository.save(character);
     }
 

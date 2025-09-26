@@ -93,6 +93,11 @@ public class PlayerService {
     public Player createPlayer(Player player) throws Exception {
         player.setGp(minimumGp);
         logger.info("Creating player: " + player);
+        Character defaultCharacter = new Character();
+        defaultCharacter.setPlayer(player);
+        defaultCharacter.setName(player.getName());
+        defaultCharacter.setClassification("Main");
+        characterService.createCharacter(defaultCharacter);
         return playerRepository.save(player);
     }
 
