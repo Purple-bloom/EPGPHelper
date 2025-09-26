@@ -97,7 +97,7 @@ public class PlayerService {
         Character defaultCharacter = new Character();
         defaultCharacter.setPlayer(player);
         defaultCharacter.setName(player.getName());
-        defaultCharacter.setClassification("Main");
+        defaultCharacter.setClassification("main");
         characterService.createCharacter(defaultCharacter);
         return out;
     }
