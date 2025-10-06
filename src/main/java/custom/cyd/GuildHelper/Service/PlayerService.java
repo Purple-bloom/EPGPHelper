@@ -268,8 +268,21 @@ public class PlayerService {
 
     private List<PlayerDto> convertPlayersToDtos(List<Player> players){
         List<PlayerDto> out = new ArrayList<>();
+        List<Character> characters = characterService.getAllCharacters();
         for (Player player : players){
-            out.add(new PlayerDto(player));
+            ArrayList<String> playerCharacters = new ArrayList<>();
+            for(Character character : characters){
+                if(Objects.equals(character.getPlayer().getId(), player.getId())){
+                    playerCharacters.add(character.getName());
+                }
+            }
+            if(!playerCharacters.isEmpty()){
+                String[] outCharacters = new String[playerCharacters.size()];
+                outCharacters = playerCharacters.toArray(outCharacters);
+                out.add(new PlayerDto(player, outCharacters));
+            } else {
+                out.add(new PlayerDto(player, new String[]{""}));
+            }
         }
         return out;
     }

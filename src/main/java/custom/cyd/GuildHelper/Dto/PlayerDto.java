@@ -10,8 +10,9 @@ public class PlayerDto {
     private double gp;
     private double prio;
     private boolean active;
+    private String[] characters;
 
-    public PlayerDto(Player player){
+    public PlayerDto(Player player, String[] characterNames){
         id = player.getId();
         name = player.getName();
         rank = player.getRank();
@@ -19,6 +20,7 @@ public class PlayerDto {
         gp = player.getGp();
         prio = ep/gp;
         active = player.getActive();
+        characters = characterNames;
     }
 
     public String toString(){
@@ -80,5 +82,13 @@ public class PlayerDto {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public String[] getCharacters() {
+        return characters;
+    }
+
+    public void setCharacters(String[] characters) {
+        this.characters = characters;
     }
 }
