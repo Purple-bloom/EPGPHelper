@@ -187,7 +187,7 @@ public class PlayerService {
                 player.setEp(player.getEp() + reward);
                 playerRepository.save(player);
                 if(raidReward.getRewardValue() != 0) {
-                    String logMessage = "Awarded " + String.format("%.2f", (raidReward.getRewardValue() * modifier)) + " EP to player " + player.getName() + " for \"" + raidReward.getRaid().getName() + ": " + raidReward.getRewardType() + "\"";
+                    String logMessage = "Awarded " + String.format("%.2f", reward) + " EP to player " + player.getName() + " for \"" + raidReward.getRaid().getName() + ": " + raidReward.getRewardType() + "\"";
                     logService.addLogToDb(logMessage);
                 }
             }
