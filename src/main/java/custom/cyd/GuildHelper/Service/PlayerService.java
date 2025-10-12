@@ -22,7 +22,7 @@ public class PlayerService {
     private static int lowBidCost;
     private static int midBidCost;
     private static int highBidCost;
-    private static int altReduction;
+    private static double altReduction;
 
     @Autowired
     private PlayerRepository playerRepository;
@@ -54,7 +54,7 @@ public class PlayerService {
         lowBidCost = settingService.loadSetting(SettingService.LOW_BID_SETTING_NAME);
         midBidCost = settingService.loadSetting(SettingService.MID_BID_SETTING_NAME);
         highBidCost = settingService.loadSetting(SettingService.HIGH_BID_SETTING_NAME);
-        altReduction = settingService.loadSetting(SettingService.ALT_REDUCTION);
+        altReduction = (double) settingService.loadSetting(SettingService.ALT_REDUCTION) / 100;
 
         if(minimumGp == 0){
             settingService.addSetting(SettingService.MINIMUM_GP_SETTING_NAME, 10);
@@ -80,7 +80,7 @@ public class PlayerService {
             settingService.addSetting(SettingService.ALT_REDUCTION, 0);
             altReduction = 0;
         }
-        System.out.printf("Initialized PlayerService with following Attributes and values %s:%f %s:%f %s:%d %s:%d %s:%d %s:%d",
+        System.out.printf("Initialized PlayerService with following Attributes and values %s:%f %s:%f %s:%d %s:%d %s:%d %s:%f",
                 SettingService.MINIMUM_GP_SETTING_NAME, minimumGp,
                 SettingService.WEEKLY_DECAY_SETTING_NAME, weeklyDecay,
                 SettingService.LOW_BID_SETTING_NAME, lowBidCost,
@@ -182,8 +182,7 @@ public class PlayerService {
                 alreadyRewardedPlayers.add(player.getId());
                 double reward = (raidReward.getRewardValue() * modifier);
                 if(!character.getClassification().equalsIgnoreCase("main")){
-                    int altModifier = settingService.loadSetting(SettingService.ALT_REDUCTION);
-                    reward = reward * (1.0 - altModifier);
+                    reward = reward * (1.0 - altReduction);
                 }
                 player.setEp(player.getEp() + reward);
                 playerRepository.save(player);

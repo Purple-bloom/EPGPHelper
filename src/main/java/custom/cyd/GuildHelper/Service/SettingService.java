@@ -16,7 +16,7 @@ import java.util.Optional;
 
 @Service
 public class SettingService {
-    private static final String[] validSettings = {"basegp", "weeklydecay", "lowcost", "midcost", "highcost"};
+    private static final String[] validSettings = {"basegp", "weeklydecay", "lowcost", "midcost", "highcost", "altreduction"};
     public static final String MINIMUM_GP_SETTING_NAME = "basegp";
     public static final String WEEKLY_DECAY_SETTING_NAME = "weeklydecay";
     public static final String LOW_BID_SETTING_NAME = "lowcost";
