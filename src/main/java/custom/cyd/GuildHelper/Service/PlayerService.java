@@ -323,7 +323,16 @@ public class PlayerService {
             return ResponseEntity.badRequest().body("Invalid setting value.");
         }
         settingService.changeSetting(SettingService.WEEKLY_DECAY_SETTING_NAME, newValue);
-        weeklyDecay = newValue;
+        weeklyDecay = (double) newValue / 100;
+        return ResponseEntity.ok("Setting changed.");
+    }
+
+    public ResponseEntity<String> updateAltReduction(int newValue){
+        if (newValue < 0 || newValue > 100){
+            return ResponseEntity.badRequest().body("Invalid setting value.");
+        }
+        settingService.changeSetting(SettingService.ALT_REDUCTION, newValue);
+        altReduction = (double) newValue / 100;
         return ResponseEntity.ok("Setting changed.");
     }
 
