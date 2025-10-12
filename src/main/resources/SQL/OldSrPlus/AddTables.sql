@@ -39,7 +39,7 @@ create table characters (
 	player integer references players,
 	name varchar(40) not null,
 	classification varchar(40) not null,
-	CHECK(classification = 'twink' or classification = 'main'),
+	CHECK(classification = 'alt' or classification = 'main'),
 	unique (name)
 );
 
