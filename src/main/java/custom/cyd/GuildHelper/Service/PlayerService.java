@@ -22,6 +22,7 @@ public class PlayerService {
     private static int lowBidCost;
     private static int midBidCost;
     private static int highBidCost;
+    private static int altReduction;
 
     @Autowired
     private PlayerRepository playerRepository;
@@ -53,6 +54,7 @@ public class PlayerService {
         lowBidCost = settingService.loadSetting(SettingService.LOW_BID_SETTING_NAME);
         midBidCost = settingService.loadSetting(SettingService.MID_BID_SETTING_NAME);
         highBidCost = settingService.loadSetting(SettingService.HIGH_BID_SETTING_NAME);
+        altReduction = settingService.loadSetting(SettingService.ALT_REDUCTION);
 
         if(minimumGp == 0){
             settingService.addSetting(SettingService.MINIMUM_GP_SETTING_NAME, 10);
@@ -74,12 +76,17 @@ public class PlayerService {
             settingService.addSetting(SettingService.HIGH_BID_SETTING_NAME, 45);
             highBidCost = 45;
         }
-        System.out.printf("Initialized PlayerService with following Attributes and values %s:%f %s:%f %s:%d %s:%d %s:%d",
+        if(altReduction == 0){
+            settingService.addSetting(SettingService.ALT_REDUCTION, 0);
+            altReduction = 0;
+        }
+        System.out.printf("Initialized PlayerService with following Attributes and values %s:%f %s:%f %s:%d %s:%d %s:%d %s:%d",
                 SettingService.MINIMUM_GP_SETTING_NAME, minimumGp,
                 SettingService.WEEKLY_DECAY_SETTING_NAME, weeklyDecay,
                 SettingService.LOW_BID_SETTING_NAME, lowBidCost,
                 SettingService.MID_BID_SETTING_NAME, midBidCost,
-                SettingService.HIGH_BID_SETTING_NAME, highBidCost);
+                SettingService.HIGH_BID_SETTING_NAME, highBidCost,
+                SettingService.ALT_REDUCTION, altReduction);
     }
 
     public Optional<Player> getPlayer(Long id){
@@ -173,7 +180,12 @@ public class PlayerService {
                 logService.addLogToDb("Not rewarding player " + player.getName() + " another time - they appeared more than once, probably due to multiboxing or an incorrect character-player relation.");
             } else {
                 alreadyRewardedPlayers.add(player.getId());
-                player.setEp(player.getEp() + (raidReward.getRewardValue() * modifier));
+                double reward = (raidReward.getRewardValue() * modifier);
+                if(!character.getClassification().equalsIgnoreCase("main")){
+                    int altModifier = settingService.loadSetting(SettingService.ALT_REDUCTION);
+                    reward = reward * (1.0 - altModifier);
+                }
+                player.setEp(player.getEp() + reward);
                 playerRepository.save(player);
                 if(raidReward.getRewardValue() != 0) {
                     String logMessage = "Awarded " + String.format("%.2f", (raidReward.getRewardValue() * modifier)) + " EP to player " + player.getName() + " for \"" + raidReward.getRaid().getName() + ": " + raidReward.getRewardType() + "\"";

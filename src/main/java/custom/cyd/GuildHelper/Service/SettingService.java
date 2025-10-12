@@ -22,6 +22,7 @@ public class SettingService {
     public static final String LOW_BID_SETTING_NAME = "lowcost";
     public static final String MID_BID_SETTING_NAME = "midcost";
     public static final String HIGH_BID_SETTING_NAME = "highcost";
+    public static final String ALT_REDUCTION = "altreduction";
     @Autowired
     private SettingRepository settingRepository;
     @Autowired
