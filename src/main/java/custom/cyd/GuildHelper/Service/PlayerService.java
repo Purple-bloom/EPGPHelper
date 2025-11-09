@@ -44,6 +44,7 @@ public class PlayerService {
 
     public List<PlayerDto> getAllPlayers(){
         List<Player> players = playerRepository.findAll();
+        players.sort(Comparator.comparingDouble(player -> player.getEp()/player.getGp()));
         return convertPlayersToDtos(players);
     }
 
