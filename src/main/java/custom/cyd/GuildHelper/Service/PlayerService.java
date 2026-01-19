@@ -173,6 +173,7 @@ public class PlayerService {
         }
 
         ArrayList<Long> alreadyRewardedPlayers = new ArrayList<Long>();
+        StringBuilder logMessage = new StringBuilder("Awarding players EP for " + raidReward.getRewardType() + " - ");
         for(Character character : characters){
             double modifier = (double) characterCountMap.get(character.getName().toLowerCase()) / maxCount;
             Player player = character.getPlayer();
@@ -187,12 +188,14 @@ public class PlayerService {
                 player.setEp(player.getEp() + reward);
                 playerRepository.save(player);
                 if(raidReward.getRewardValue() != 0) {
-                    String logMessage = "Awarded " + String.format("%.2f", reward) + " EP to player " + player.getName() + " for \"" + raidReward.getRaid().getName() + ": " + raidReward.getRewardType() + "\"";
-                    logService.addLogToDb(logMessage);
+                    logMessage.append(String.format("%s:%.2f, ", player.getName(), reward));
                 }
             }
-
         }
+        logMessage.deleteCharAt(logMessage.length()-1);
+        logMessage.deleteCharAt(logMessage.length()-1);
+        logService.addLogToDb(logMessage.toString());
+
         return ResponseEntity.ok("Successfully awarded EP to all Players of the characters. Reminder: EP is calculated based on the # of character appearances, not the rows.");
     }
 
