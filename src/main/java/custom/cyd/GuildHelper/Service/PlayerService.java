@@ -173,7 +173,7 @@ public class PlayerService {
         }
 
         ArrayList<Long> alreadyRewardedPlayers = new ArrayList<Long>();
-        StringBuilder logMessage = new StringBuilder("Awarding players EP for " + raidReward.getRewardType() + " - ");
+        StringBuilder logMessage = new StringBuilder("Awarding players EP for " + raidReward.getRaid().getName() + ":" + raidReward.getRewardType() + " - ");
         for(Character character : characters){
             double modifier = (double) characterCountMap.get(character.getName().toLowerCase()) / maxCount;
             Player player = character.getPlayer();
