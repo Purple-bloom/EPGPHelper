@@ -43,9 +43,9 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(Arrays.asList(
                 "http://localhost:1234",
-                "http://cydraech.ddns.net:11245/",
-                "http://cydraech.ddns.net:11246/",
-                "http://cydraech.ddns.net:11247/"
+                "http://cydraech.ddns.net:11245",
+                "http://cydraech.ddns.net:11246",
+                "http://cydraech.ddns.net:11247"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
