@@ -13,7 +13,7 @@ import java.util.random.RandomGenerator;
 public class AuthService {
     Logger logger = Logger.getLogger(AuthService.class.getName());
 
-    private final int random = Random.from(RandomGenerator.getDefault()).nextInt();
+    private final int random = Random.from(RandomGenerator.getDefault()).nextInt(5)+2;
 
     private String authToken = null;
 
@@ -35,8 +35,7 @@ public class AuthService {
 
         String token = "";
         for (char elem : chars){
-            token += elem+random;
-            token += elem*random;
+            token += elem*random%10;
         }
         this.authToken = token;
         return token;
