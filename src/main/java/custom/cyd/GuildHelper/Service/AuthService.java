@@ -4,11 +4,16 @@ import custom.cyd.GuildHelper.GuildHelperApplication;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
+import java.util.Random;
 import java.util.logging.Logger;
+import java.util.random.RandomGenerator;
 
 @Service
 public class AuthService {
     Logger logger = Logger.getLogger(AuthService.class.getName());
+
+    private final int random = Random.from(RandomGenerator.getDefault()).nextInt();
 
     private String authToken = null;
 
@@ -26,10 +31,12 @@ public class AuthService {
     }
 
     public String generateToken(String username, String password){
-        byte[] bytes = (username.toLowerCase()+password).getBytes(StandardCharsets.UTF_8);
+        char[] chars = (username.toLowerCase() + password).toCharArray();
+
         String token = "";
-        for (byte elem : bytes){
-            token += Byte.toString((byte) (elem*2.14));
+        for (char elem : chars){
+            token += elem+random;
+            token += elem*random;
         }
         this.authToken = token;
         return token;
