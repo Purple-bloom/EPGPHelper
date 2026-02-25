@@ -110,7 +110,15 @@ public class PlayerService {
     }
 
     public void deletePlayer(Long id){
-        logger.info("Deleting Player " + Objects.requireNonNull(playerRepository.findById(id).orElse(null)));
+        Player player = playerRepository.findById(id).orElse(null);
+        if (player == null) {
+            return;
+        }
+        logger.info("Deleting Player " + player);
+        List<Character> characters = characterRepository.findByPlayer(player);
+        for(Character character : characters){
+            characterRepository.delete(character);
+        }
         playerRepository.deleteById(id);
     }
 
