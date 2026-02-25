@@ -19,9 +19,7 @@ repositories {
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
-	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-jdbc
 	implementation("org.springframework.boot:spring-boot-starter-jdbc")
-	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	runtimeOnly("org.postgresql:postgresql")
@@ -31,4 +29,8 @@ dependencies {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+springBoot {
+	mainClass = "custom.cyd.GuildHelper.GuildHelperApplication"
 }
