@@ -272,7 +272,11 @@ public class PlayerService {
         targetPlayer.setGp(targetPlayer.getGp() + gpValue);
         playerRepository.save(targetPlayer);
         logger.info("Awarded " + gpValue + " GP to player " + targetPlayer.getId());
-        logService.addLogToDb("Awarded " + gpValue + " GP to player " + targetPlayer.getName());
+        if(discount){
+            logService.addLogToDb("Awarded " + gpValue + " GP to player " + targetPlayer.getName() + " (offspec discount active).");
+        } else {
+            logService.addLogToDb("Awarded " + gpValue + " GP to player " + targetPlayer.getName());
+        }
         return ResponseEntity.ok("Successfully added GP.");
     }
 
