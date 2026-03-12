@@ -259,11 +259,13 @@ public class PlayerService {
         return ResponseEntity.ok("Successfully awarded EP to all Players of the characters. Reminder: EP is calculated based on the # of character appearances, not the rows.");
     }
 
-    public ResponseEntity<String> awardGpToPlayerOfCharacter(Long id, int bidType){
+    public ResponseEntity<String> awardGpToPlayerOfCharacter(Long id, int bidType, boolean discount){
         int gpValue = 0;
         if(bidType == 1) gpValue = lowBidCost;
         if(bidType == 2) gpValue = midBidCost;
         if(bidType == 3) gpValue = highBidCost;
+
+        if(discount) gpValue = gpValue/2;
 
         Character targetCharacter = characterService.getCharacterById(id);
         Player targetPlayer = targetCharacter.getPlayer();

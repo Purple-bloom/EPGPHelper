@@ -114,7 +114,18 @@ public class PlayerController {
     )
     public ResponseEntity<String> awardGpToPlayer(@RequestBody Integer bidType, @PathVariable("id") Long id){
         logger.info("GP award player endpoint called of character: " + id + " for bid type " + bidType);
-        return playerService.awardGpToPlayerOfCharacter(id, bidType);
+        return playerService.awardGpToPlayerOfCharacter(id, bidType, false);
+    }
+
+
+    @PostMapping (
+            value = "/awardGpOffspec/{id}",
+            consumes = "application/json",
+            produces = "application/json"
+    )
+    public ResponseEntity<String> awardGpToPlayerOffspec(@RequestBody Integer bidType, @PathVariable("id") Long id){
+        logger.info("GP award player endpoint called of character: " + id + " for bid type " + bidType);
+        return playerService.awardGpToPlayerOfCharacter(id, bidType, true);
     }
 
     @PostMapping(
