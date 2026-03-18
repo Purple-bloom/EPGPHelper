@@ -186,7 +186,7 @@ public class PlayerService {
             double modifier = (double) characterCountMap.get(character.getName().toLowerCase()) / maxCount;
             Player player = character.getPlayer();
             if(alreadyRewardedPlayers.contains(player.getId())){
-                logService.addLogToDb("Not rewarding player " + player.getName() + " another time - they appeared more than once, probably due to multiboxing or an incorrect character-player relation.");
+                logService.addLogToDb("WARNING: Not rewarding player " + player.getName() + " another time - they appeared more than once, probably due to multiboxing or an incorrect character-player relation.");
             } else {
                 alreadyRewardedPlayers.add(player.getId());
                 double reward = (raidReward.getRewardValue() * modifier);
@@ -200,11 +200,13 @@ public class PlayerService {
                 }
             }
         }
-        logMessage.deleteCharAt(logMessage.length()-1);
-        logMessage.deleteCharAt(logMessage.length()-1);
-        logService.addLogToDb(logMessage.toString());
+        if(raidReward.getRewardValue() != 0) {
+            logMessage.deleteCharAt(logMessage.length()-1);
+            logMessage.deleteCharAt(logMessage.length()-1);
+            logService.addLogToDb(logMessage.toString());
+        }
 
-        return ResponseEntity.ok("Successfully awarded EP to all Players of the characters. Reminder: EP is calculated based on the # of character appearances, not the rows.");
+        return ResponseEntity.ok("Successfully awarded EP to all Players of the characters. Reminder: EP is calculated based on the # of character appearances, if someone appears more than once, that reduces the EP gained by anyone who only appears once.");
     }
 
     public ResponseEntity<String> unrewardPlayers(String[][] characternames, Long raidRewardId){
