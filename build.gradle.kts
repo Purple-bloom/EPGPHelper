@@ -36,5 +36,5 @@ tasks.withType<Test> {
 }
 
 springBoot {
-	mainClass = "custom.cyd.EpgpHelperBackend.EpgpHelperBackend"
+	mainClass = "custom.cyd.epgphelperbackend.EpgpHelperBackend"
 }
