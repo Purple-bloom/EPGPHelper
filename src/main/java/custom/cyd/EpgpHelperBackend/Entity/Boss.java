@@ -8,8 +8,7 @@ import java.io.Serializable;
 @Table(name = "bosses")
 public class Boss implements Serializable {
     @Id
-    @SequenceGenerator(name="bosses_seq", sequenceName="bosses_seq", allocationSize=1)
-    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="bosses_seq")
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
     private String name;
     @ManyToOne(cascade = CascadeType.MERGE)

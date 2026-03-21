@@ -8,8 +8,7 @@ import java.sql.Timestamp;
 @Table(name = "Logs")
 public class Log {
     @Id
-    @SequenceGenerator(name="logs_seq", sequenceName="logs_seq", allocationSize=1)
-    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="logs_seq")
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
     private Timestamp time;
     private String message;

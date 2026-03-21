@@ -8,8 +8,7 @@ import java.io.Serializable;
 @Table(name = "Items")
 public class Item implements Serializable {
     @Id
-    @SequenceGenerator(name="items_seq", sequenceName="items_seq", allocationSize=1)
-    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="items_seq")
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
     private String name;
     @Enumerated()

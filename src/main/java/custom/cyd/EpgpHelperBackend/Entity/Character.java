@@ -8,8 +8,7 @@ import java.io.Serializable;
 @Table(name = "characters")
 public class Character implements Serializable {
     @Id
-    @SequenceGenerator(name="characters_seq", sequenceName="characters_seq", allocationSize=1)
-    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="characters_seq")
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "player", referencedColumnName = "id")

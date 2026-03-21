@@ -8,8 +8,7 @@ import java.io.Serializable;
 @Table(name = "raids")
 public class Raid implements Serializable {
     @Id
-    @SequenceGenerator(name="raids_seq", sequenceName="raids_seq", allocationSize=1)
-    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="raids_seq")
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
     private String name;
 

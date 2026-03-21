@@ -6,8 +6,7 @@ import jakarta.persistence.*;
 @Table(name = "raids_rewards")
 public class RaidReward {
     @Id
-    @SequenceGenerator(name="raids_seq", sequenceName="raids_seq", allocationSize=1)
-    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="raids_seq")
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "raid", referencedColumnName = "id")

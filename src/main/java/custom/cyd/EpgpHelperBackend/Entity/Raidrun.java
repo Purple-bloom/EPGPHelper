@@ -6,8 +6,7 @@ import jakarta.persistence.*;
 @Table(name = "raidruns")
 public class Raidrun {
     @Id
-    @SequenceGenerator(name="raidruns_seq", sequenceName="raidruns_seq", allocationSize=1)
-    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="raidruns_seq")
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
     private Raid raid;
