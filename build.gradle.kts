@@ -25,7 +25,7 @@ dependencies {
 	// Source: https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
 	implementation("org.xerial:sqlite-jdbc:3.51.3.0")
 	// Source: https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-community-dialects
-	implementation("org.hibernate.orm:hibernate-community-dialects:7.3.0.Final")
+	implementation("org.hibernate.orm:hibernate-community-dialects:6.6.2.Final")
 	runtimeOnly("org.postgresql:postgresql")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
