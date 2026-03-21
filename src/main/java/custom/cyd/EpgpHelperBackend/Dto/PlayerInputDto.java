@@ -4,24 +4,20 @@ import custom.cyd.EpgpHelperBackend.Entity.Player;
 
 public class PlayerInputDto {
     private String name;
-    private String rank;
 
     public PlayerInputDto(Player player){
         name = player.getName();
-        rank = player.getRank();
     }
 
     public PlayerInputDto(){
     }
 
-    public PlayerInputDto(String name, String rank){
+    public PlayerInputDto(String name){
         this.name = name;
-        this.rank = rank;
     }
 
     public String toString(){
-        return String.format("Player Name: %s, Rank: %s",
-                name, rank);
+        return String.format("Player Name: %s", name);
     }
 
     public String getName() {
@@ -30,13 +26,5 @@ public class PlayerInputDto {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getRank() {
-        return rank;
-    }
-
-    public void setRank(String rank) {
-        this.rank = rank;
     }
 }

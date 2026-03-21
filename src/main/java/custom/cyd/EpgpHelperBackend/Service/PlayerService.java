@@ -135,7 +135,6 @@ public class PlayerService {
                     " to new EP: " + player.getEp() + " and new GP: " + player.getGp());
         }
         originalPlayer.setName(player.getName());
-        originalPlayer.setRank(player.getRank());
         originalPlayer.setEp(player.getEp());
         originalPlayer.setGp(player.getGp());
         originalPlayer.setActive(player.getActive());

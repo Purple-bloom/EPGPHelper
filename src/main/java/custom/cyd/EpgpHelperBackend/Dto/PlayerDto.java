@@ -5,7 +5,6 @@ import custom.cyd.EpgpHelperBackend.Entity.Player;
 public class PlayerDto {
     private Long id;
     private String name;
-    private String rank;
     private double ep;
     private double gp;
     private double prio;
@@ -15,7 +14,6 @@ public class PlayerDto {
     public PlayerDto(Player player, String[] characterNames){
         id = player.getId();
         name = player.getName();
-        rank = player.getRank();
         ep = player.getEp();
         gp = player.getGp();
         prio = ep/gp;
@@ -24,8 +22,8 @@ public class PlayerDto {
     }
 
     public String toString(){
-        return String.format("Player ID: %d, Name: %s, Rank: %s, EP: %f, GP: %f, Changed: %s",
-                id, name, rank, ep, gp, active);
+        return String.format("Player ID: %d, Name: %s, EP: %f, GP: %f, Changed: %s",
+                id, name, ep, gp, active);
     }
 
     public Long getId() {
@@ -42,14 +40,6 @@ public class PlayerDto {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getRank() {
-        return rank;
-    }
-
-    public void setRank(String rank) {
-        this.rank = rank;
     }
 
     public double getEp() {

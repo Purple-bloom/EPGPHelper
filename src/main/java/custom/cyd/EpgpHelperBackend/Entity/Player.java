@@ -11,15 +11,14 @@ public class Player implements Serializable {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private String rank;
     private double ep;
     private double gp;
     private boolean active;
 
     @Override
     public String toString(){
-        return String.format("Player ID: %d, Name: %s, Rank: %s, EP: %f, GP: %f, changed: %s",
-                id, name, rank, ep, gp, active);
+        return String.format("Player ID: %d, Name: %s, EP: %f, GP: %f, changed: %s",
+                id, name, ep, gp, active);
     }
 
     public Long getId() {
@@ -36,14 +35,6 @@ public class Player implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getRank() {
-        return rank;
-    }
-
-    public void setRank(String rank) {
-        this.rank = rank;
     }
 
     public double getEp() {

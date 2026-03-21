@@ -64,7 +64,6 @@ public class PlayerController {
             player.setEp(0);
             player.setGp(0);
             player.setName(playerInputDto.getName());
-            player.setRank(playerInputDto.getRank());
             player.setId(null);
             player.setActive(true);
             Player playerResponse = playerService.createPlayer(player);
