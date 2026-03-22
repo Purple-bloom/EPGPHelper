@@ -7,14 +7,13 @@ What this does:
 
 
 # Setup:
-- install a database, preferably a postgresql instance and set it up. Initiate it by running AddRaids.sql and AddTables.sql in /src/main/resources/SQL/EPGP
 - clone this repository to your homeserver / local machine
-- set up a script to start the backend server like follows:
-- ./gradlew bootRun --args='--spring.datasource.url=jdbc:postgresql://YOURDATABASEADDRESS:DATABASEPORT/DATABASENAME --spring.datasource.username=dbUsername --spring.datasource.password=dbPassword --server.port=port --username=admin --password=123456'
+- set up a script to start the backend server like follows (this script needs to target gradlew in the install folder, so maybe just put your script there):
+- ./gradlew bootRun --args='--spring.datasource.url=jdbc:sqlite:GuildEpgp.db --server.port=port --username=admin --password=123456'
 - explanation of the individual args:
-- spring.datasource.url is your database url, please follow the schema provided
-- spring.datasource.username is your database username
-- spring.datasource.password is your database password
+- spring.datasource.url is your database url, you can replace "GuildEpgp.db" with the name of your guild if you wish. If you run multiple guilds, you can just run seperate instances with different db names!
+    - example script guild 1: ./gradlew bootRun --args='--spring.datasource.url=jdbc:sqlite:Guild1.db --server.port=port --username=admin --password=123456'
+    - example script guild 2: ./gradlew bootRun --args='--spring.datasource.url=jdbc:sqlite:Guild2.db --server.port=port --username=admin --password=123456'
 - server.port is the port for this backend server to run on - this will determine what you have to configure for the frontend server!
 - username & password are the credentials to access the "admin" functions such as adding and modifying players, actually handing out points etc.
 
