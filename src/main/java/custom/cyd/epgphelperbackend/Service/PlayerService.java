@@ -23,6 +23,7 @@ public class PlayerService {
     private static int midBidCost;
     private static int highBidCost;
     private static double altReduction;
+    private static double offspecGpDiscount;
 
     @Autowired
     private PlayerRepository playerRepository;
@@ -54,7 +55,8 @@ public class PlayerService {
         lowBidCost = settingService.loadSetting(SettingService.LOW_BID_SETTING_NAME);
         midBidCost = settingService.loadSetting(SettingService.MID_BID_SETTING_NAME);
         highBidCost = settingService.loadSetting(SettingService.HIGH_BID_SETTING_NAME);
-        altReduction = (double) settingService.loadSetting(SettingService.ALT_REDUCTION) / 100;
+        altReduction = (double) settingService.loadSetting(SettingService.ALT_REDUCTION_SETTING_NAME) / 100;
+        offspecGpDiscount = (double) settingService.loadSetting(SettingService.OS_GP_DISCOUNT_SETTING_NAME) / 100;
 
         if(minimumGp == 0){
             settingService.addSetting(SettingService.MINIMUM_GP_SETTING_NAME, 10);
@@ -77,16 +79,21 @@ public class PlayerService {
             highBidCost = 45;
         }
         if(altReduction == 0){
-            settingService.addSetting(SettingService.ALT_REDUCTION, 0);
+            settingService.addSetting(SettingService.ALT_REDUCTION_SETTING_NAME, 0);
             altReduction = 0;
         }
-        System.out.printf("Initialized PlayerService with following Attributes and values %s:%f %s:%f %s:%d %s:%d %s:%d %s:%f",
+        if(offspecGpDiscount == 0){
+            settingService.addSetting(SettingService.OS_GP_DISCOUNT_SETTING_NAME, 0);
+            offspecGpDiscount = 0;
+        }
+        System.out.printf("Initialized PlayerService with following Attributes and values %s:%f %s:%f %s:%d %s:%d %s:%d %s:%f %s:%f",
                 SettingService.MINIMUM_GP_SETTING_NAME, minimumGp,
                 SettingService.WEEKLY_DECAY_SETTING_NAME, weeklyDecay,
                 SettingService.LOW_BID_SETTING_NAME, lowBidCost,
                 SettingService.MID_BID_SETTING_NAME, midBidCost,
                 SettingService.HIGH_BID_SETTING_NAME, highBidCost,
-                SettingService.ALT_REDUCTION, altReduction);
+                SettingService.ALT_REDUCTION_SETTING_NAME, altReduction,
+                SettingService.OS_GP_DISCOUNT_SETTING_NAME, offspecGpDiscount);
     }
 
     public Optional<Player> getPlayer(Long id){
@@ -261,12 +268,12 @@ public class PlayerService {
     }
 
     public ResponseEntity<String> awardGpToPlayerOfCharacter(Long id, int bidType, boolean discount){
-        int gpValue = 0;
+        double gpValue = 0;
         if(bidType == 1) gpValue = lowBidCost;
         if(bidType == 2) gpValue = midBidCost;
         if(bidType == 3) gpValue = highBidCost;
 
-        if(discount) gpValue = gpValue/2;
+        if(discount) gpValue = gpValue*(1-offspecGpDiscount);
 
         Character targetCharacter = characterService.getCharacterById(id);
         Player targetPlayer = targetCharacter.getPlayer();
@@ -349,7 +356,7 @@ public class PlayerService {
         if (newValue < 0 || newValue > 100){
             return ResponseEntity.badRequest().body("Invalid setting value.");
         }
-        settingService.changeSetting(SettingService.ALT_REDUCTION, newValue);
+        settingService.changeSetting(SettingService.ALT_REDUCTION_SETTING_NAME, newValue);
         altReduction = (double) newValue / 100;
         return ResponseEntity.ok("Setting changed.");
     }

@@ -149,7 +149,7 @@ public class PlayerController {
             return playerService.updateMidBidCost(setting.getSettingValue());
         } else if (setting.getSettingName().equalsIgnoreCase(SettingService.LOW_BID_SETTING_NAME)){
             return playerService.updateLowBidCost(setting.getSettingValue());
-        } else if (setting.getSettingName().equalsIgnoreCase(SettingService.ALT_REDUCTION)){
+        } else if (setting.getSettingName().equalsIgnoreCase(SettingService.ALT_REDUCTION_SETTING_NAME)){
             return playerService.updateAltReduction(setting.getSettingValue());
         } else {
             return ResponseEntity.badRequest().body("Could not find setting to edit.");

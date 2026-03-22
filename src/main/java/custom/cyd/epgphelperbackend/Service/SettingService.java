@@ -16,13 +16,17 @@ import java.util.Optional;
 
 @Service
 public class SettingService {
-    private static final String[] validSettings = {"basegp", "weeklydecay", "lowcost", "midcost", "highcost", "altreduction"};
     public static final String MINIMUM_GP_SETTING_NAME = "basegp";
     public static final String WEEKLY_DECAY_SETTING_NAME = "weeklydecay";
     public static final String LOW_BID_SETTING_NAME = "lowcost";
     public static final String MID_BID_SETTING_NAME = "midcost";
     public static final String HIGH_BID_SETTING_NAME = "highcost";
-    public static final String ALT_REDUCTION = "altreduction";
+    public static final String ALT_REDUCTION_SETTING_NAME = "altreduction";
+    public static final String OS_GP_DISCOUNT_SETTING_NAME = "offspecgpdiscount";
+
+    private static final String[] validSettings = {MINIMUM_GP_SETTING_NAME, WEEKLY_DECAY_SETTING_NAME, LOW_BID_SETTING_NAME, MID_BID_SETTING_NAME,
+            HIGH_BID_SETTING_NAME, ALT_REDUCTION_SETTING_NAME, OS_GP_DISCOUNT_SETTING_NAME};
+
     @Autowired
     private SettingRepository settingRepository;
     @Autowired
@@ -53,10 +57,16 @@ public class SettingService {
         if(setting.isEmpty()){
             return ResponseEntity.badRequest().body("Failed to find Setting by name of \"" + settingName + "\".");
         }
-        Integer oldVal = setting.get().getSettingValue();
+        if(newValue < 0) return ResponseEntity.badRequest().body(settingName + " value must be positive.");
+        if(settingName.equalsIgnoreCase(WEEKLY_DECAY_SETTING_NAME) | settingName.equalsIgnoreCase(ALT_REDUCTION_SETTING_NAME) | settingName.equalsIgnoreCase(OS_GP_DISCOUNT_SETTING_NAME)) {
+            if( newValue >= 100 ){
+                return ResponseEntity.badRequest().body(settingName + " value must be in range 0 to 100.");
+            }
+        }
+        Integer oldValue = setting.get().getSettingValue();
         setting.get().setSettingValue(newValue);
         settingRepository.save(setting.get());
-        logService.addLogToDb("Setting by name \"" + settingName + "\" changed. Old value: " + oldVal + "New Value: " + newValue + ".");
+        logService.addLogToDb("Setting by name \"" + settingName + "\" changed. Old value: " + oldValue + " New Value: " + newValue + ".");
         return ResponseEntity.ok("Updated " + settingName + " to new Value " + newValue + ".");
     }
 
