@@ -24,7 +24,7 @@ public class SettingService {
     public static final String ALT_REDUCTION_SETTING_NAME = "altreduction";
     public static final String OS_GP_DISCOUNT_SETTING_NAME = "offspecgpdiscount";
 
-    private static final String[] validSettings = {MINIMUM_GP_SETTING_NAME, WEEKLY_DECAY_SETTING_NAME, LOW_BID_SETTING_NAME, MID_BID_SETTING_NAME,
+    public static final String[] VALID_SETTINGS = {MINIMUM_GP_SETTING_NAME, WEEKLY_DECAY_SETTING_NAME, LOW_BID_SETTING_NAME, MID_BID_SETTING_NAME,
             HIGH_BID_SETTING_NAME, ALT_REDUCTION_SETTING_NAME, OS_GP_DISCOUNT_SETTING_NAME};
 
     @Autowired
@@ -41,7 +41,7 @@ public class SettingService {
         if(setting.isPresent()){
             return ResponseEntity.badRequest().body("Setting by name \"" + settingName + "\" already exists.");
         }
-        if(Arrays.stream(validSettings).noneMatch(validSetting -> validSetting.equalsIgnoreCase(settingName))){
+        if(Arrays.stream(VALID_SETTINGS).noneMatch(validSetting -> validSetting.equalsIgnoreCase(settingName))){
             return ResponseEntity.badRequest().body("Setting by name \"" + settingName + "\" is not allowed to exist.");
         }
         Setting newSetting = new Setting();
@@ -57,12 +57,7 @@ public class SettingService {
         if(setting.isEmpty()){
             return ResponseEntity.badRequest().body("Failed to find Setting by name of \"" + settingName + "\".");
         }
-        if(newValue < 0) return ResponseEntity.badRequest().body(settingName + " value must be positive.");
-        if(settingName.equalsIgnoreCase(WEEKLY_DECAY_SETTING_NAME) | settingName.equalsIgnoreCase(ALT_REDUCTION_SETTING_NAME) | settingName.equalsIgnoreCase(OS_GP_DISCOUNT_SETTING_NAME)) {
-            if( newValue >= 100 ){
-                return ResponseEntity.badRequest().body(settingName + " value must be in range 0 to 100.");
-            }
-        }
+
         Integer oldValue = setting.get().getSettingValue();
         setting.get().setSettingValue(newValue);
         settingRepository.save(setting.get());

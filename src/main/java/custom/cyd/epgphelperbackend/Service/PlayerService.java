@@ -387,4 +387,13 @@ public class PlayerService {
         highBidCost = newValue;
         return ResponseEntity.ok("Setting changed.");
     }
+
+    public ResponseEntity<String> updateOffspecGpDiscount(int newValue){
+        if (newValue < 0 || newValue > 100){
+            return ResponseEntity.badRequest().body("Invalid setting value.");
+        }
+        settingService.changeSetting(SettingService.OS_GP_DISCOUNT_SETTING_NAME, newValue);
+        offspecGpDiscount = newValue;
+        return ResponseEntity.ok("Setting changed.");
+    }
 }

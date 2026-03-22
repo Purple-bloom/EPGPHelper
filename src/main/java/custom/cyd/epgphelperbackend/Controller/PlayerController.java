@@ -139,6 +139,7 @@ public class PlayerController {
     )
     public ResponseEntity<String> changeSetting(@RequestBody Setting setting){
         logger.info("Changing setting" + setting.getSettingName() + " to new value " + setting.getSettingValue() + ".");
+
         if(setting.getSettingName().equalsIgnoreCase(SettingService.MINIMUM_GP_SETTING_NAME)){
             return playerService.updateMinimumGp(setting.getSettingValue());
         } else if (setting.getSettingName().equalsIgnoreCase(SettingService.WEEKLY_DECAY_SETTING_NAME)){
@@ -151,6 +152,8 @@ public class PlayerController {
             return playerService.updateLowBidCost(setting.getSettingValue());
         } else if (setting.getSettingName().equalsIgnoreCase(SettingService.ALT_REDUCTION_SETTING_NAME)){
             return playerService.updateAltReduction(setting.getSettingValue());
+        } else if (setting.getSettingName().equalsIgnoreCase(SettingService.OS_GP_DISCOUNT_SETTING_NAME)) {
+            return playerService.updateOffspecGpDiscount(setting.getSettingValue());
         } else {
             return ResponseEntity.badRequest().body("Could not find setting to edit.");
         }
