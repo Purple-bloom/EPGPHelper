@@ -39,6 +39,10 @@ public class CharacterService {
         return characterRepository.findById(id).orElse(null);
     }
 
+    public Character getCharacterByName(String name){
+        return characterRepository.findByNameIgnoreCase(name).orElse(null);
+    }
+
     public Character createCharacter(Character character){
         assert character.getName() != null; //TODO: Properly check this shit
         return characterRepository.save(character);

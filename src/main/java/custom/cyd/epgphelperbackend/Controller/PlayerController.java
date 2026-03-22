@@ -109,7 +109,7 @@ public class PlayerController {
     )
     public ResponseEntity<String> awardGpToPlayer(@RequestBody Integer bidType, @PathVariable("id") Long id){
         logger.info("GP award player endpoint called of character: " + id + " for bid type " + bidType);
-        return playerService.awardGpToPlayerOfCharacter(id, bidType, false);
+        return playerService.awardGpToPlayerOfCharacter(id, bidType, false, null);
     }
 
 
@@ -120,7 +120,17 @@ public class PlayerController {
     )
     public ResponseEntity<String> awardGpToPlayerOffspec(@RequestBody Integer bidType, @PathVariable("id") Long id){
         logger.info("GP award player endpoint called of character: " + id + " for bid type " + bidType);
-        return playerService.awardGpToPlayerOfCharacter(id, bidType, true);
+        return playerService.awardGpToPlayerOfCharacter(id, bidType, true, null);
+    }
+
+    @PostMapping (
+            value = "/awardGpAddon",
+            consumes = "application/json",
+            produces = "application/json"
+    )
+    public ResponseEntity<String> awardGpViaAddonText(@RequestBody String addonExport){
+        logger.info("GP award via addon text endpoint.");
+        return playerService.awardGpViaAddonText(addonExport);
     }
 
     @PostMapping(

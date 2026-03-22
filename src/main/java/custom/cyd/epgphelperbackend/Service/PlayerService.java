@@ -267,7 +267,7 @@ public class PlayerService {
         return ResponseEntity.ok("Successfully awarded EP to all Players of the characters. Reminder: EP is calculated based on the # of character appearances, not the rows.");
     }
 
-    public ResponseEntity<String> awardGpToPlayerOfCharacter(Long id, int bidType, boolean discount){
+    public ResponseEntity<String> awardGpToPlayerOfCharacter(Long id, int bidType, boolean discount, String itemName){
         double gpValue = 0;
         if(bidType == 1) gpValue = lowBidCost;
         if(bidType == 2) gpValue = midBidCost;
@@ -280,10 +280,42 @@ public class PlayerService {
         targetPlayer.setGp(targetPlayer.getGp() + gpValue);
         playerRepository.save(targetPlayer);
         logger.info("Awarded " + gpValue + " GP to player " + targetPlayer.getId());
+        String itemLogString = "";
+        if(itemName != null){
+            itemLogString = " Item: " + itemName;
+        }
         if(discount){
-            logService.addLogToDb("Awarded " + gpValue + " GP to player " + targetPlayer.getName() + " (offspec discount active).");
+            logService.addLogToDb("Awarded " + gpValue + " GP to player " + targetPlayer.getName() + " (offspec discount active)." + itemLogString);
         } else {
-            logService.addLogToDb("Awarded " + gpValue + " GP to player " + targetPlayer.getName());
+            logService.addLogToDb("Awarded " + gpValue + " GP to player " + targetPlayer.getName() + "." + itemLogString);
+        }
+        return ResponseEntity.ok("Successfully added GP.");
+    }
+
+    public ResponseEntity<String> awardGpViaAddonText(String addonExportText){
+        String[] events = addonExportText.split(";");
+        for(String eventText : events){
+            String[] info = eventText.split("\\|");
+            String characterName = info[0];
+            String bid = info[1];
+            String itemName = info[2];
+
+            boolean discount = bid.toUpperCase().contains("OS");
+            int bidType = 0;
+            if(bid.toUpperCase().contains("LOW")){
+                bidType = 1;
+            } else if (bid.toUpperCase().contains("MID")){
+                bidType = 2;
+            } else if (bid.toUpperCase().contains("HIGH")){
+                bidType = 3;
+            }
+            Long charId = characterService.getCharacterByName(characterName).getId();
+
+            if(bidType == 0 || charId == null){
+                return ResponseEntity.badRequest().body("Export string broken. Please check it - it is manually fixable.");
+            }
+
+            awardGpToPlayerOfCharacter(charId, bidType, discount, itemName);
         }
         return ResponseEntity.ok("Successfully added GP.");
     }
