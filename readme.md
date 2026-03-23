@@ -22,10 +22,11 @@ by default it lists a bunch of http://localhost:1234 addresses - this needs to b
 
 
 
-An example linux bash script to start this server could look like this:
-#!/bin/bash
-cd /pathToGetHere/EPGPHelper
-./gradlew bootRun --args='--spring.datasource.url=jdbc:postgresql://192.168.178.101:10025/epgpDatabase --spring.datasource.username=admin --spring.datasource.password=123456 --server.port=12345'
+An example linux bash script to start this server could look like this:<br>
+#!/bin/bash<br>
+cd /pathToGetHere/EPGPHelper<br>
+./gradlew bootRun --args='--spring.datasource.url=jdbc:sqlite:Guild1.db --server.port=12345 --username=admin --password=123456'<br>
 
 
 Link to frontend: https://github.com/Purple-bloom/EPGPHelperFrontend
+Link to compatible addon: https://github.com/Purple-bloom/EpgpWhisperer
