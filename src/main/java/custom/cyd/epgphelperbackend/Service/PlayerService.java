@@ -294,8 +294,17 @@ public class PlayerService {
 
     public ResponseEntity<String> awardGpViaAddonText(String addonExportText){
         String[] events = addonExportText.split(";");
+        class GpAwardData {
+            Long characterId;
+            int bidType;
+            boolean discount;
+            String itemName;
+        }
+
+        ArrayList<GpAwardData> gpAwardData = new ArrayList<>();
+
         for(String eventText : events){
-            String[] info = eventText.split("\\|");
+            String[] info = eventText.split("--");
             String characterName = info[0];
             String bid = info[1];
             String itemName = info[2];
@@ -315,7 +324,17 @@ public class PlayerService {
                 return ResponseEntity.badRequest().body("Export string broken. Please check it - it is manually fixable.");
             }
 
-            awardGpToPlayerOfCharacter(charId, bidType, discount, itemName);
+            GpAwardData input = new GpAwardData();
+            input.characterId = charId;
+            input.bidType = bidType;
+            input.discount = discount;
+            input.itemName = itemName;
+            gpAwardData.add(input);
+        }
+
+        //split this from the normal loop so points dont get partially awarded in case theres a syntax error in the gp award input
+        for (GpAwardData input : gpAwardData){
+            awardGpToPlayerOfCharacter(input.characterId, input.bidType, input.discount, input.itemName);
         }
         return ResponseEntity.ok("Successfully added GP.");
     }
