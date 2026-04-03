@@ -19,6 +19,8 @@ public class CharacterDto implements Serializable {
         this.characterClass = character.getCharacterClass();
     }
 
+    public CharacterDto(){}
+
     public Long getId() {
         return id;
     }
