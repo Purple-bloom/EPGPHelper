@@ -44,7 +44,9 @@ public class CharacterService {
     }
 
     public Character createCharacter(Character character){
-        assert character.getName() != null; //TODO: Properly check this shit
+        assert character.getName() != null;
+        assert character.getName().length() < 16;
+        character.setName(character.getName().substring(0,1).toUpperCase() + character.getName().substring(1));
         return characterRepository.save(character);
     }
 
@@ -67,6 +69,7 @@ public class CharacterService {
         originalCharacter.setName(characterDto.getName());
         originalCharacter.setPlayer(player);
         originalCharacter.setClassification(characterDto.getClassification());
+        originalCharacter.setCharacterClass(characterDto.getCharacterClass());
         return characterRepository.save(originalCharacter);
     }
 }

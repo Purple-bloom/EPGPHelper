@@ -1,5 +1,6 @@
 package custom.cyd.epgphelperbackend.Service;
 
+import custom.cyd.epgphelperbackend.Dto.CharacterDto;
 import custom.cyd.epgphelperbackend.Dto.PlayerDto;
 import custom.cyd.epgphelperbackend.Entity.Character;
 import custom.cyd.epgphelperbackend.Entity.Player;
@@ -357,19 +358,18 @@ public class PlayerService {
         List<PlayerDto> out = new ArrayList<>();
         List<Character> characters = characterService.getAllCharacters();
         for (Player player : players){
-            ArrayList<String> playerCharacters = new ArrayList<>();
+            ArrayList<Character> playerCharacters = new ArrayList<>();
             for(Character character : characters){
                 if(Objects.equals(character.getPlayer().getId(), player.getId())){
-                    playerCharacters.add(character.getName());
+                    playerCharacters.add(character);
                 }
             }
-            if(!playerCharacters.isEmpty()){
-                String[] outCharacters = new String[playerCharacters.size()];
-                outCharacters = playerCharacters.toArray(outCharacters);
-                out.add(new PlayerDto(player, outCharacters));
-            } else {
-                out.add(new PlayerDto(player, new String[]{""}));
+            CharacterDto[] characterDtos = new CharacterDto[playerCharacters.toArray().length];
+            int i = 0;
+            for(Character character : playerCharacters){
+                characterDtos[i++] = new CharacterDto(character);
             }
+            out.add(new PlayerDto(player, characterDtos));
         }
         return out;
     }

@@ -15,6 +15,7 @@ public class Character implements Serializable {
     private Player player;
     private String name;
     private String classification;
+    private String characterClass;
 
     public Long getId() {
         return id;
@@ -42,5 +43,13 @@ public class Character implements Serializable {
 
     public void setClassification(String classification) {
         this.classification = classification;
+    }
+
+    public String getCharacterClass() {
+        return characterClass;
+    }
+
+    public void setCharacterClass(String characterClass) {
+        this.characterClass = characterClass;
     }
 }

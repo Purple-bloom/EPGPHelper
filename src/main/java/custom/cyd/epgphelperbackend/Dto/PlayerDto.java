@@ -9,16 +9,16 @@ public class PlayerDto {
     private double gp;
     private double prio;
     private boolean active;
-    private String[] characters;
+    private CharacterDto[] characters;
 
-    public PlayerDto(Player player, String[] characterNames){
+    public PlayerDto(Player player, CharacterDto[] characters){
         id = player.getId();
         name = player.getName();
         ep = player.getEp();
         gp = player.getGp();
         prio = ep/gp;
         active = player.getActive();
-        characters = characterNames;
+        this.characters = characters;
     }
 
     public String toString(){
@@ -74,11 +74,11 @@ public class PlayerDto {
         this.active = active;
     }
 
-    public String[] getCharacters() {
+    public CharacterDto[] getCharacters() {
         return characters;
     }
 
-    public void setCharacters(String[] characters) {
+    public void setCharacters(CharacterDto[] characters) {
         this.characters = characters;
     }
 }
