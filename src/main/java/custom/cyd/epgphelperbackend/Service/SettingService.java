@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 /**
@@ -67,6 +68,6 @@ public class SettingService {
 
     public Integer loadSetting(String settingName){
         Optional<Setting> setting = settingRepository.findBySettingNameIgnoreCase(settingName);
-        return setting.map(Setting::getSettingValue).orElse(0);
+        return setting.map(Setting::getSettingValue).orElseThrow(() -> new NoSuchElementException("Setting not found: " + settingName));
     }
 }
