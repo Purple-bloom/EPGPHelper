@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 
 @Service
 public class LogService {
-    Logger logger = Logger.getLogger(ItemService.class.getName());
+    Logger logger = Logger.getLogger(LogService.class.getName());
 
     @Autowired
     LogRepository logRepository;
