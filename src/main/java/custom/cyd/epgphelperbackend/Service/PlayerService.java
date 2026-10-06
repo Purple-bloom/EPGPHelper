@@ -51,42 +51,14 @@ public class PlayerService {
 
     @PostConstruct
     private void initializePlayerService(){
-        minimumGp = settingService.loadSetting(SettingService.MINIMUM_GP_SETTING_NAME);
-        weeklyDecay = (double) settingService.loadSetting(SettingService.WEEKLY_DECAY_SETTING_NAME) / 100;
-        lowBidCost = settingService.loadSetting(SettingService.LOW_BID_SETTING_NAME);
-        midBidCost = settingService.loadSetting(SettingService.MID_BID_SETTING_NAME);
-        highBidCost = settingService.loadSetting(SettingService.HIGH_BID_SETTING_NAME);
-        altReduction = (double) settingService.loadSetting(SettingService.ALT_REDUCTION_SETTING_NAME) / 100;
-        offspecGpDiscount = (double) settingService.loadSetting(SettingService.OS_GP_DISCOUNT_SETTING_NAME) / 100;
+        minimumGp = loadOrDefault(SettingService.MINIMUM_GP_SETTING_NAME, 10);
+        weeklyDecay = (double) loadOrDefault(SettingService.WEEKLY_DECAY_SETTING_NAME, 20) / 100;
+        lowBidCost = loadOrDefault(SettingService.LOW_BID_SETTING_NAME, 5);
+        midBidCost = loadOrDefault(SettingService.MID_BID_SETTING_NAME, 15);
+        highBidCost = loadOrDefault(SettingService.HIGH_BID_SETTING_NAME, 45);
+        altReduction = (double) loadOrDefault(SettingService.ALT_REDUCTION_SETTING_NAME, 0) / 100;
+        offspecGpDiscount = (double) loadOrDefault(SettingService.OS_GP_DISCOUNT_SETTING_NAME,0) / 100;
 
-        if(minimumGp == 0){
-            settingService.addSetting(SettingService.MINIMUM_GP_SETTING_NAME, 10);
-            minimumGp = 10;
-        }
-        if(weeklyDecay == 0){
-            settingService.addSetting(SettingService.WEEKLY_DECAY_SETTING_NAME, 20);
-            weeklyDecay = (double) 20 /100;
-        }
-        if(lowBidCost == 0){
-            settingService.addSetting(SettingService.LOW_BID_SETTING_NAME, 5);
-            lowBidCost = 5;
-        }
-        if(midBidCost == 0){
-            settingService.addSetting(SettingService.MID_BID_SETTING_NAME, 15);
-            midBidCost = 15;
-        }
-        if(highBidCost == 0){
-            settingService.addSetting(SettingService.HIGH_BID_SETTING_NAME, 45);
-            highBidCost = 45;
-        }
-        if(altReduction == 0){
-            settingService.addSetting(SettingService.ALT_REDUCTION_SETTING_NAME, 0);
-            altReduction = 0;
-        }
-        if(offspecGpDiscount == 0){
-            settingService.addSetting(SettingService.OS_GP_DISCOUNT_SETTING_NAME, 0);
-            offspecGpDiscount = 0;
-        }
         System.out.printf("Initialized PlayerService with following Attributes and values %s:%f %s:%f %s:%d %s:%d %s:%d %s:%f %s:%f",
                 SettingService.MINIMUM_GP_SETTING_NAME, minimumGp,
                 SettingService.WEEKLY_DECAY_SETTING_NAME, weeklyDecay,
@@ -95,6 +67,16 @@ public class PlayerService {
                 SettingService.HIGH_BID_SETTING_NAME, highBidCost,
                 SettingService.ALT_REDUCTION_SETTING_NAME, altReduction,
                 SettingService.OS_GP_DISCOUNT_SETTING_NAME, offspecGpDiscount);
+    }
+
+    private Integer loadOrDefault(String settingName, int defaultValue) {
+        try {
+            return settingService.loadSetting(settingName);
+        } catch (NoSuchElementException e) { // Replace NoSuchElementException with your specific Exception class if custom
+            settingService.addSetting(settingName, defaultValue);
+            logService.addLogToDb("Created setting with name " + settingName + " and default value " + defaultValue + ".");
+            return defaultValue;
+        }
     }
 
     public Optional<Player> getPlayer(Long id){
@@ -344,8 +326,12 @@ public class PlayerService {
         List<Player> players = playerRepository.findAll();
         for(Player player : players){
             if(player.getActive()) {
-                player.setGp(minimumGp + (player.getGp() - minimumGp) * (1 - weeklyDecay));
-                player.setEp(player.getEp() * (1 - weeklyDecay));
+                double newGp = minimumGp + (player.getGp() - minimumGp) * (1 - weeklyDecay);
+                newGp = Math.floor(newGp*100)/100;
+                double newEp = player.getEp() * (1 - weeklyDecay);
+                newEp = Math.floor(newEp*100)/100;
+                player.setGp(newGp);
+                player.setEp(newEp);
             }
         }
         playerRepository.saveAll(players);
