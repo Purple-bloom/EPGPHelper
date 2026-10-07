@@ -23,6 +23,9 @@ public class PlayerService {
     private static int lowBidCost;
     private static int midBidCost;
     private static int highBidCost;
+    private static int minPrioLow;
+    private static int minPrioMid;
+    private static int minPrioHigh;
     private static double altReduction;
     private static double offspecGpDiscount;
 
@@ -44,9 +47,13 @@ public class PlayerService {
     @Autowired
     private CharacterRepository characterRepository;
 
-    public List<PlayerDto> getAllPlayers(){
+    public List<PlayerDto> getAllPlayerDtos(){
         List<Player> players = playerRepository.findAll();
         return convertPlayersToDtos(players);
+    }
+
+    public List<Player> getAllPlayers(){
+        return playerRepository.findAll();
     }
 
     @PostConstruct
@@ -56,6 +63,9 @@ public class PlayerService {
         lowBidCost = loadOrDefault(SettingService.LOW_BID_SETTING_NAME, 5);
         midBidCost = loadOrDefault(SettingService.MID_BID_SETTING_NAME, 15);
         highBidCost = loadOrDefault(SettingService.HIGH_BID_SETTING_NAME, 45);
+        minPrioLow = loadOrDefault(SettingService.LOW_MINIMUM_PRIO_SETTING_NAME, 0);
+        minPrioMid = loadOrDefault(SettingService.MID_MINIMUM_PRIO_SETTING_NAME, 50);
+        minPrioHigh = loadOrDefault(SettingService.HIGH_MINIMUM_PRIO_SETTING_NAME, 100);
         altReduction = (double) loadOrDefault(SettingService.ALT_REDUCTION_SETTING_NAME, 0) / 100;
         offspecGpDiscount = (double) loadOrDefault(SettingService.OS_GP_DISCOUNT_SETTING_NAME,0) / 100;
 
@@ -131,21 +141,19 @@ public class PlayerService {
         return playerRepository.save(originalPlayer);
     }
 
-    public ResponseEntity<String> rewardPlayers(String[][] characternames, Long raidRewardId){
+    public ResponseEntity<String> rewardPlayers(String[] characternames, Long raidRewardId){
         RaidReward raidReward = raidRewardsService.getRaidReward(raidRewardId).orElse(null);
         if(raidReward == null){
             logger.severe("Attempted update with invalid Raidreward. " + raidRewardId);
             return null;
         }
         Map<String, Integer> characterCountMap = new HashMap<>();
-        for(String[] row : characternames){
-            for(String characterString : row){
-                characterString = characterString.toLowerCase();
-                if(characterCountMap.containsKey(characterString)){
-                    characterCountMap.put(characterString, characterCountMap.get(characterString) + 1);
-                } else {
-                    characterCountMap.put(characterString, 1);
-                }
+        for(String charactername : characternames){
+            charactername = charactername.toLowerCase();
+            if(characterCountMap.containsKey(charactername)){
+                characterCountMap.put(charactername, characterCountMap.get(charactername) + 1);
+            } else {
+                characterCountMap.put(charactername, 1);
             }
         }
 
@@ -170,7 +178,7 @@ public class PlayerService {
         }
 
         ArrayList<Long> alreadyRewardedPlayers = new ArrayList<Long>();
-        StringBuilder logMessage = new StringBuilder("Awarding players EP for " + raidReward.getRaid().getName() + ":" + raidReward.getRewardType() + " - ");
+        StringBuilder logMessage = new StringBuilder("Awarding players EP for " + raidReward.getRaid().getName() + ", " + raidReward.getRewardType() + " - ");
         for(Character character : characters){
             double modifier = (double) characterCountMap.get(character.getName().toLowerCase()) / maxCount;
             Player player = character.getPlayer();
@@ -431,6 +439,33 @@ public class PlayerService {
         }
         settingService.changeSetting(SettingService.OS_GP_DISCOUNT_SETTING_NAME, newValue);
         offspecGpDiscount = newValue;
+        return ResponseEntity.ok("Setting changed.");
+    }
+
+    public ResponseEntity<String> updateMinPrioLow(int newValue){
+        if (newValue < 0){
+            return ResponseEntity.badRequest().body("Invalid setting value.");
+        }
+        settingService.changeSetting(SettingService.LOW_MINIMUM_PRIO_SETTING_NAME, newValue);
+        minPrioLow = newValue;
+        return ResponseEntity.ok("Setting changed.");
+    }
+
+    public ResponseEntity<String> updateMinPrioMid(int newValue){
+        if (newValue < 0){
+            return ResponseEntity.badRequest().body("Invalid setting value.");
+        }
+        settingService.changeSetting(SettingService.MID_MINIMUM_PRIO_SETTING_NAME, newValue);
+        minPrioLow = newValue;
+        return ResponseEntity.ok("Setting changed.");
+    }
+
+    public ResponseEntity<String> updateMinPrioHigh(int newValue){
+        if (newValue < 0){
+            return ResponseEntity.badRequest().body("Invalid setting value.");
+        }
+        settingService.changeSetting(SettingService.HIGH_MINIMUM_PRIO_SETTING_NAME, newValue);
+        minPrioLow = newValue;
         return ResponseEntity.ok("Setting changed.");
     }
 }

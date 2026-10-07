@@ -27,7 +27,7 @@ public class PlayerController {
 
     @GetMapping("/get")
     public List<PlayerDto> getAllPlayers(){
-        return playerService.getAllPlayers();
+        return playerService.getAllPlayerDtos();
     }
 
     @GetMapping("/get/{id}")
@@ -97,7 +97,7 @@ public class PlayerController {
             consumes = "application/json",
             produces = "application/json"
     )
-    public ResponseEntity<String> rewardPlayers(@RequestBody String[][] characternames, @PathVariable("id") Long id){
+    public ResponseEntity<String> rewardPlayers(@RequestBody String[] characternames, @PathVariable("id") Long id){
         logger.info("rewarding players: " + Arrays.toString(characternames) + " for raidReward " + id);
         return playerService.rewardPlayers(characternames, id);
     }
@@ -164,6 +164,12 @@ public class PlayerController {
             return playerService.updateAltReduction(setting.getSettingValue());
         } else if (setting.getSettingName().equalsIgnoreCase(SettingService.OS_GP_DISCOUNT_SETTING_NAME)) {
             return playerService.updateOffspecGpDiscount(setting.getSettingValue());
+        } else if (setting.getSettingName().equalsIgnoreCase(SettingService.LOW_MINIMUM_PRIO_SETTING_NAME)) {
+            return playerService.updateMinPrioLow(setting.getSettingValue());
+        } else if (setting.getSettingName().equalsIgnoreCase(SettingService.MID_MINIMUM_PRIO_SETTING_NAME)) {
+            return playerService.updateMinPrioMid(setting.getSettingValue());
+        } else if (setting.getSettingName().equalsIgnoreCase(SettingService.HIGH_MINIMUM_PRIO_SETTING_NAME)) {
+            return playerService.updateMinPrioHigh(setting.getSettingValue());
         } else {
             return ResponseEntity.badRequest().body("Could not find setting to edit.");
         }

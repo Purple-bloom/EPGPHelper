@@ -2,14 +2,13 @@ package custom.cyd.epgphelperbackend.Service;
 
 import custom.cyd.epgphelperbackend.Entity.Setting;
 import custom.cyd.epgphelperbackend.Repository.SettingRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * This service is not supposed to be exposed through any API. The other services will use this service to update values.
@@ -17,16 +16,23 @@ import java.util.Optional;
 
 @Service
 public class SettingService {
+    Logger logger = Logger.getLogger(SettingService.class.getName());
+
     public static final String MINIMUM_GP_SETTING_NAME = "basegp";
     public static final String WEEKLY_DECAY_SETTING_NAME = "weeklydecay";
     public static final String LOW_BID_SETTING_NAME = "lowcost";
     public static final String MID_BID_SETTING_NAME = "midcost";
     public static final String HIGH_BID_SETTING_NAME = "highcost";
-    public static final String ALT_REDUCTION_SETTING_NAME = "altreduction";
+    public static final String ALT_REDUCTION_SETTING_NAME = "epreductionforalts";
     public static final String OS_GP_DISCOUNT_SETTING_NAME = "offspecgpdiscount";
+    public static final String LOW_MINIMUM_PRIO_SETTING_NAME = "lowminimumprio";
+    public static final String MID_MINIMUM_PRIO_SETTING_NAME = "midminimumprio";
+    public static final String HIGH_MINIMUM_PRIO_SETTING_NAME = "highminimumprio";
 
     public static final String[] VALID_SETTINGS = {MINIMUM_GP_SETTING_NAME, WEEKLY_DECAY_SETTING_NAME, LOW_BID_SETTING_NAME, MID_BID_SETTING_NAME,
-            HIGH_BID_SETTING_NAME, ALT_REDUCTION_SETTING_NAME, OS_GP_DISCOUNT_SETTING_NAME};
+            HIGH_BID_SETTING_NAME, ALT_REDUCTION_SETTING_NAME, OS_GP_DISCOUNT_SETTING_NAME, LOW_MINIMUM_PRIO_SETTING_NAME, MID_MINIMUM_PRIO_SETTING_NAME, HIGH_MINIMUM_PRIO_SETTING_NAME};
+    public static final String[] ADDON_RELEVANT_SETTINGS = {LOW_BID_SETTING_NAME, MID_BID_SETTING_NAME,
+            HIGH_BID_SETTING_NAME, ALT_REDUCTION_SETTING_NAME, OS_GP_DISCOUNT_SETTING_NAME, LOW_MINIMUM_PRIO_SETTING_NAME, MID_MINIMUM_PRIO_SETTING_NAME, HIGH_MINIMUM_PRIO_SETTING_NAME};
 
     @Autowired
     private SettingRepository settingRepository;
@@ -35,6 +41,32 @@ public class SettingService {
 
     public List<Setting> getAllSettings(){
         return settingRepository.findAll();
+    }
+
+    @PostConstruct
+    public void removeInvalidSettings(){
+        //this function is needed in case I decide I need to change how settings are named x)
+        List<Setting> allSettings = settingRepository.findAll();
+        for(Setting setting : allSettings){
+            boolean isValidSetting = false;
+            for(String validSetting : VALID_SETTINGS){
+                if(validSetting.equalsIgnoreCase(setting.getSettingName())){
+                    isValidSetting = true;
+                }
+            }
+            if(!isValidSetting) {
+                logger.info("Deleting deprecated setting " + setting.getSettingName());
+                settingRepository.delete(setting);
+            }
+        }
+    }
+
+    public List<Setting> getAllAddonRelevantSettings(){
+        List<Setting> out = new ArrayList<>();
+        for(String name : ADDON_RELEVANT_SETTINGS){
+            out.add(settingRepository.findBySettingNameIgnoreCase(name).orElseThrow());
+        }
+        return out;
     }
 
     public ResponseEntity<String> addSetting(String settingName, Integer newValue){
